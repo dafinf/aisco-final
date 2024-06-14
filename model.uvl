@@ -37,21 +37,19 @@ features
 					Location
 		optional
 			Donation {abstract true}
-				optional
+				or
 					Online {abstract true}
 						alternative
 							ViaWebsite
 							ViaPaymentGateway
-								mandatory
-									PG.PaymentGateway
 					Confirmation
 					DonasiLoggedIn
 					GoodsDonation
 			Withdraw
 				mandatory
 					viaDisbursement
-						mandatory
-							PG.PaymentGateway
+			PG.PaymentGateway
 
 constraints
 	PSAK45 => Income & Expense
+	viaDisbursement => PG.Disbursement

@@ -78,8 +78,9 @@ public class ProgramResourceImpl extends ProgramResourceComponent {
         programRepository.updateObject(program);
         return program.toHashMap();
     }
-
+    
     public Program updateProgram(VMJExchange vmjExchange, UUID id) {
+        String logoUrl = "";
         Program program = programRepository.getObject(id);
         Map<String, Object> payload = vmjExchange.getPayload();
         System.out.println(payload);
@@ -87,11 +88,44 @@ public class ProgramResourceImpl extends ProgramResourceComponent {
         program.setDescription((String) payload.get("description"));
         program.setTarget((String) payload.get("target"));
         program.setPartner((String) payload.get("partner"));
-        program.setLogoUrl((String) payload.get("logoUrl"));
+        
+        if (payload.get("logoUrl") instanceof String) {
+        	program.setLogoUrl((String)payload.get("logoUrl"));
+        } else {
+        	Map<String, byte[]> uploadedFile = (HashMap<String, byte[]>) payload.get("logoUrl");
+            logoUrl = "data:" + (new String(uploadedFile.get("type"))).split(" ")[1].replaceAll("\\s+", "")
+                    + ";base64," + Base64.getEncoder().encodeToString(uploadedFile.get("content"));
+            int fileSize = uploadedFile.get("content").length;
+            if (fileSize > 4000000)
+                throw new FileSizeException(4.0, ((double) fileSize) / 1000000, "megabyte");
+            try {
+                String type = URLConnection
+                        .guessContentTypeFromStream(new ByteArrayInputStream(uploadedFile.get("content")));
+                if (type == null || !type.startsWith("image"))
+                    throw new FileTypeException("image");
+            } catch (IOException e) {
+                throw new FileNotFoundException();
+            }
+            program.setLogoUrl(logoUrl);
+        }
         program.setExecutionDate((String) payload.get("executionDate"));
    
         return program;
     }
+
+//    public Program updateProgram(VMJExchange vmjExchange, UUID id) {
+//        Program program = programRepository.getObject(id);
+//        Map<String, Object> payload = vmjExchange.getPayload();
+//        System.out.println(payload);
+//        program.setName((String) payload.get("name"));
+//        program.setDescription((String) payload.get("description"));
+//        program.setTarget((String) payload.get("target"));
+//        program.setPartner((String) payload.get("partner"));
+//        program.setLogoUrl((String) payload.get("logoUrl"));
+//        program.setExecutionDate((String) payload.get("executionDate"));
+//   
+//        return program;
+//    }
 
     @Route(url="call/activity/detail")
     public HashMap<String, Object> getProgram(VMJExchange vmjExchange) {
@@ -125,26 +159,4 @@ public class ProgramResourceImpl extends ProgramResourceComponent {
         programRepository.deleteObject(id);
         return getAllProgram(vmjExchange);
     }
-    
-//    public long calculateDonation(Program program) {
-//    	List<FinancialReport> incomes = financialReportRepository.getAllObject("financialreport_income");
-//    	
-//    	long accumulatedDonation = 0L;
-//    	for (FinancialReport income : incomes) {
-//    		if (income.getProgram().getIdProgram() == program.getIdProgram()) {
-//    			accumulatedDonation += income.getAmount();
-//    		}
-//    	}
-//    	
-//    	float percentage = (float)accumulatedDonation/Long.parseLong(program.getTarget());
-//    	System.out.println("==============calculateDonation()=============");
-//    	System.out.print("accumulatedDonation: ");
-//    	System.out.println(accumulatedDonation);
-//    	System.out.print("percentage: ");
-//    	System.out.println(percentage);
-//    	System.out.println("==============================================");
-//    	
-//    	return accumulatedDonation;
-//    }
-
 }

@@ -1,4 +1,4 @@
-package aisco.withdraw.viaDisbursement;
+package aisco.withdraw.viadisbursement;
 
 import aisco.withdraw.core.WithdrawDecorator;
 import aisco.withdraw.core.Withdraw;
@@ -19,7 +19,6 @@ public class WithdrawImpl extends WithdrawDecorator {
 	protected String vendorName;
 
 	protected String disbursementId;
-	protected String moneyTransferStatus;
 	protected String agentMoneyTransferId;
 	protected String agentMoneyTransferDirection;
 	protected String internationalMoneyTransferExchangeRate;
@@ -39,7 +38,6 @@ public class WithdrawImpl extends WithdrawDecorator {
 		this.status = "";
 		this.vendorName = "";
 		
-		this.moneyTransferStatus = "";
 	    this.agentMoneyTransferId = "";
 		this.agentMoneyTransferDirection = "";
 		this.internationalMoneyTransferExchangeRate = "";
@@ -58,7 +56,6 @@ public class WithdrawImpl extends WithdrawDecorator {
 	}
 	
 	public WithdrawImpl(WithdrawComponent record, String status, String vendorName,
-			String moneyTransferStatus,
 			String agentMoneyTransferId,
 			String agentMoneyTransferDirection,
 			String internationalMoneyTransferExchangeRate,
@@ -79,7 +76,6 @@ public class WithdrawImpl extends WithdrawDecorator {
 		this.vendorName = vendorName;
 		
 
-		this.moneyTransferStatus = moneyTransferStatus;
 	    this.agentMoneyTransferId = agentMoneyTransferId;
 		this.agentMoneyTransferDirection = agentMoneyTransferDirection;
 		this.internationalMoneyTransferExchangeRate = internationalMoneyTransferExchangeRate;
@@ -97,7 +93,6 @@ public class WithdrawImpl extends WithdrawDecorator {
 	}
 	
 	public WithdrawImpl(UUID id, WithdrawComponent record, String status, String vendorName,
-			String moneyTransferStatus,
 			String agentMoneyTransferId,
 			String agentMoneyTransferDirection,
 			String internationalMoneyTransferExchangeRate,
@@ -118,7 +113,6 @@ public class WithdrawImpl extends WithdrawDecorator {
 
 		this.objectName = WithdrawImpl.class.getName();
 
-		this.moneyTransferStatus = moneyTransferStatus;
 	    this.agentMoneyTransferId = agentMoneyTransferId;
 		this.agentMoneyTransferDirection = agentMoneyTransferDirection;
 		this.internationalMoneyTransferExchangeRate = internationalMoneyTransferExchangeRate;
@@ -149,15 +143,6 @@ public class WithdrawImpl extends WithdrawDecorator {
 	public void setVendorName(String vendorName) {
 		this.vendorName = vendorName;
 	}
-	
-    
-    public String getMoneyTransferStatus() {
-        return moneyTransferStatus;
-    }
-
-    public void setMoneyTransferStatus(String moneyTransferStatus) {
-        this.moneyTransferStatus = moneyTransferStatus;
-    }
 
     public String getAgentMoneyTransferId() {
         return agentMoneyTransferId;
@@ -276,8 +261,36 @@ public class WithdrawImpl extends WithdrawDecorator {
        withdrawMap.put("id", id);
        withdrawMap.put("vendorName", getVendorName());
        withdrawMap.put("status", getStatus());
+       
+       withdrawMap.put("date", record.getDate());
+       withdrawMap.put("amount", record.getAmount());
+       withdrawMap.put("disbursementMethod", record.getDisbursementMethod());
+       withdrawMap.put("description", record.getDescription());
+       withdrawMap.put("idProgram", record.getProgram().getIdProgram());
+       
+//       this.id = UUID.randomUUID();
+//		this.name = "";
+//       this.email = "";
+//       this.phone = "";
+//       this.amount = 0;
+//       this.paymentMethod = "";
+//		this.date = "";
+//		this.program = null;
+//		this.income = null;
+//		this.description = "";
+//		this.objectName = DonationImpl.class.getName();
+//		this.user = null;
+		
+//		this.id = UUID.randomUUID();
+//        this.amount = 0;
+//        this.date = "";
+//		this.program = null;
+//		this.expense = null;
+//		this.description = "";
+//		this.objectName = WithdrawImpl.class.getName();
+//		this.user = null;
+//		this.disbursementMethod = "";
 
-       withdrawMap.put("moneyTransferStatus", getMoneyTransferStatus());
        withdrawMap.put("agentMoneyTransferId", getAgentMoneyTransferId());
        withdrawMap.put("agentMoneyTransferDirection", getAgentMoneyTransferDirection());
        withdrawMap.put("internationalMoneyTransferExchangeRate", getInternationalMoneyTransferExchangeRate());

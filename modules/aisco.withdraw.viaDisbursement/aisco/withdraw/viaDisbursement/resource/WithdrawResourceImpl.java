@@ -1,4 +1,4 @@
-package aisco.withdraw.viaDisbursement;
+package aisco.withdraw.viadisbursement;
 
 import aisco.withdraw.WithdrawFactory;
 import aisco.withdraw.core.Withdraw;
@@ -6,7 +6,7 @@ import aisco.withdraw.core.WithdrawDecorator;
 import aisco.withdraw.core.WithdrawResourceComponent;
 import aisco.withdraw.core.WithdrawResourceDecorator;
 
-import aisco.withdraw.viaDisbursement.WithdrawImpl;
+import aisco.withdraw.viadisbursement.WithdrawImpl;
 
 import aisco.program.core.Program;
 
@@ -43,7 +43,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 public class WithdrawResourceImpl extends WithdrawResourceDecorator {
-	private final int DONATION_COA_CODE = 42010;
+	private final int DISBURSEMENT_COA_CODE = 60000;
 	private final List<String> PAYMENT_SUCCESS_STATUS = new ArrayList<>(Arrays.asList("SUCCESSFUL"));
 	private final List<String> PAYMENT_FAILED_STATUS = new ArrayList<>(Arrays.asList("FAILED"));
 	
@@ -62,7 +62,6 @@ public class WithdrawResourceImpl extends WithdrawResourceDecorator {
 		withdraw  = createWithdraw(vmjExchange);
 		
 		withdrawRepository.saveObject(withdraw);
-		// Withdraw savedWithdraw = withdrawRepository.getObject(withdraw.getId());
 		return withdraw.toHashMap();
 	}
     
@@ -74,13 +73,11 @@ public class WithdrawResourceImpl extends WithdrawResourceDecorator {
 		String vendorName = (String) vmjExchange.getRequestBodyForm("vendor_name");
         
 		String disbursementMethod = (String) vmjExchange.getRequestBodyForm("disbursement_method");
+		
+		UUID idProgram = UUID.fromString((String) vmjExchange.getRequestBodyForm("idprogram"));
+		Program program = programRepository.getObject(idProgram);
+        String title = "Penarikan dana untuk Program " + program.getName();
 
-//		UUID idProgram = UUID.fromString((String) vmjExchange.getRequestBodyForm("idprogram"));
-//		Program program = programRepository.getObject(idProgram);
-//        String title = "Donasi untuk Program " + program.getName();
-  
-
-		String moneyTransferStatus = "";
 	    String agentMoneyTransferId = "";
 		String agentMoneyTransferDirection = "";
 		String internationalMoneyTransferExchangeRate = "";
@@ -122,7 +119,7 @@ public class WithdrawResourceImpl extends WithdrawResourceDecorator {
 	            Type mapType = new TypeToken<Map<String, Object>>() {}.getType();
 	            Map<String, Object> rawResponseMap = gson.fromJson(responseBody, mapType);
 	            Map<String, Object> dataMap = (Map<String, Object>) rawResponseMap.get("data");
-	            moneyTransferStatus = (String) dataMap.get("status");
+	            status = (String) dataMap.get("status");
 
 	            int disbursementIdInt = ((Double) dataMap.get("id")).intValue();
 	            disbursementId = String.valueOf(disbursementIdInt);
@@ -242,9 +239,10 @@ public class WithdrawResourceImpl extends WithdrawResourceDecorator {
 	        }
 		}
 
+		System.out.println(WithdrawImpl.class.getName());
 		Withdraw withdraw  = record.createWithdraw(vmjExchange, WithdrawImpl.class.getName());
-		Withdraw viaPaymentGateway = WithdrawFactory.createWithdraw("aisco.withdraw.viaDisbursement.WithdrawImpl", withdraw, status, vendorName,
-				moneyTransferStatus,
+		System.out.println(withdraw);
+		Withdraw viaDisbursement = WithdrawFactory.createWithdraw("aisco.withdraw.viadisbursement.WithdrawImpl", withdraw, status, vendorName,
 				agentMoneyTransferId,
 				agentMoneyTransferDirection,
 				internationalMoneyTransferExchangeRate,
@@ -259,7 +257,11 @@ public class WithdrawResourceImpl extends WithdrawResourceDecorator {
 				specialMoneyTransferSenderJob,
 				specialMoneyTransferDirection,
 				disbursementId);
-		return viaPaymentGateway;
+		
+		System.out.println(withdraw);
+		System.out.println(viaDisbursement);
+		
+		return viaDisbursement;
 	}
 
     
@@ -309,6 +311,7 @@ public class WithdrawResourceImpl extends WithdrawResourceDecorator {
 		
 		return viaPaymentGateway;
 	}
+    
     // @Restriced(permission = "")
     @Route(url="call/viapaymentgateway/update")
     public HashMap<String, Object> updateWithdraw(VMJExchange vmjExchange){
@@ -323,7 +326,7 @@ public class WithdrawResourceImpl extends WithdrawResourceDecorator {
 	}
 
 	// @Restriced(permission = "")
-    @Route(url="call/viapaymentgateway/detail")
+    @Route(url="call/viadisbursement/detail")
     public HashMap<String, Object> getWithdraw(VMJExchange vmjExchange){
 		return record.getWithdraw(vmjExchange);
 	}
@@ -368,9 +371,9 @@ public class WithdrawResourceImpl extends WithdrawResourceDecorator {
 //    }
 
 	// @Restriced(permission = "")
-    @Route(url="call/viapaymentgateway/list")
+    @Route(url="call/viadisbursement/list")
     public List<HashMap<String,Object>> getAllWithdraw(VMJExchange vmjExchange){
-		List<Withdraw> withdrawList = withdrawRepository.getAllObject("withdraw_viapaymentgateway");
+		List<Withdraw> withdrawList = withdrawRepository.getAllObject("withdraw_viadisbursement");
 		System.out.println(withdrawList);
 		return transformWithdrawListToHashMap(withdrawList);
 	}
@@ -385,7 +388,7 @@ public class WithdrawResourceImpl extends WithdrawResourceDecorator {
 	}
 
 	// @Restriced(permission = "")
-    @Route(url="call/viapaymentgateway/delete")
+    @Route(url="call/viadisbursement/delete")
     public List<HashMap<String,Object>> deleteWithdraw(VMJExchange vmjExchange){
 		return getAllWithdraw(vmjExchange);
 	}
@@ -425,40 +428,39 @@ public class WithdrawResourceImpl extends WithdrawResourceDecorator {
 //        }
 //    }
     
-//    @Route(url="call/receivedisbursementcallback")
-//    public void receiveDisbursementCallback(VMJExchange vmjExchange) {
-//    	Map<String, Object> payload = vmjExchange.getPayload();
-//    	String paymentId = (String) payload.get("id");
-//    	String status = (String) payload.get("status");
-//    	
-//    	//getWithdraw with given paymentId
-//    	List<Withdraw> withdrawList = withdrawRepository.getListObject("withdraw_viapaymentgateway", "paymentid", paymentId);
-//    	Withdraw withdraw = withdrawList.get(0);
-//    	WithdrawImpl withdrawViaPaymentGateway = (WithdrawImpl) withdraw;
-//    	
-//    	//update status of withdraw
-//    	if (withdrawViaPaymentGateway.getStatus().equals("PENDING")) {
-//            if (status.equals("SUCCESSFUL")) {
-//            	withdrawViaPaymentGateway.setStatus("BERHASIL");
-//            	
-//            	//createExpense
-//            	String date = withdraw.getDate();
-//            	long amount = withdraw.getAmount();
-//            	String description = withdraw.getDescription();
-//            	Program program = withdraw.getProgram();
-//            	String disbursementMethod = withdraw.getPaymentMethod();
-//            	ChartOfAccount coa = withdrawRepository.getProxyObject(ChartOfAccountComponent.class, DONATION_COA_CODE);
-//            	FinancialReport financialReport = FinancialReportFactory.createFinancialReport("aisco.financialreport.core.FinancialReportImpl", date, amount, description, program, coa);
-//        		FinancialReport expense = FinancialReportFactory.createFinancialReport("aisco.financialreport.expense.FinancialReportImpl", financialReport);
-//        		financialReportRepository.saveObject(expense);
-//                withdraw.setExpense((FinancialReportComponent) expense);
-//                
-//            } else if (status.equals("FAILED")) {
-//            	withdrawViaPaymentGateway.setStatus("DITOLAK");
-//            }
-//            withdrawRepository.updateObject(withdraw);
-//        }
-//    }
+    @Route(url="call/receivedisbursementcallback")
+    public void receiveDisbursementCallback(VMJExchange vmjExchange) {
+    	Map<String, Object> payload = vmjExchange.getPayload();
+    	String disbursementId = (String) payload.get("id");
+    	String status = (String) payload.get("status");
+    	
+    	List<Withdraw> withdrawList = withdrawRepository.getListObject("withdraw_viadisbursement", "disbursementid", disbursementId);
+    	Withdraw withdraw = withdrawList.get(0);
+    	WithdrawImpl withdrawViaPaymentGateway = (WithdrawImpl) withdraw;
+    	
+    	//update status of withdraw
+    	if (withdrawViaPaymentGateway.getStatus().equals("PENDING")) {
+            if (status.equals("DONE")) {
+            	withdrawViaPaymentGateway.setStatus("BERHASIL");
+            	
+            	//createExpense
+            	String date = withdraw.getDate();
+            	long amount = withdraw.getAmount();
+            	String description = withdraw.getDescription();
+            	Program program = withdraw.getProgram();
+            	String disbursementMethod = withdraw.getDisbursementMethod();
+            	ChartOfAccount coa = withdrawRepository.getProxyObject(ChartOfAccountComponent.class, DISBURSEMENT_COA_CODE);
+            	FinancialReport financialReport = FinancialReportFactory.createFinancialReport("aisco.financialreport.core.FinancialReportImpl", date, amount, description, program, coa);
+        		FinancialReport expense = FinancialReportFactory.createFinancialReport("aisco.financialreport.expense.FinancialReportImpl", financialReport);
+        		financialReportRepository.saveObject(expense);
+                withdraw.setExpense((FinancialReportComponent) expense);
+                
+            } else if (status.equals("CANCELLED")) {
+            	withdrawViaPaymentGateway.setStatus("DITUNDA");
+            }
+            withdrawRepository.updateObject(withdraw);
+        }
+    }
     	
 
 }

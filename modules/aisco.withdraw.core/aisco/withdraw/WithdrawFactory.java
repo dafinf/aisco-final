@@ -26,10 +26,6 @@ public class WithdrawFactory
                 try {
                     constructor = constructorList[i];
                     System.out.println(constructor.toString());
-                    for(Object obj: base) {
-                    	System.out.println(obj);
-                    }
-                    System.out.println(base);
                     record = (Withdraw) constructor.newInstance(base);
                     break;
                 } catch (IllegalArgumentException e) {

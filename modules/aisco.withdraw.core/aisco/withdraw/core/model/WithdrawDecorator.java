@@ -68,6 +68,27 @@ public abstract class WithdrawDecorator extends WithdrawComponent {
     public void setUser(User user) {
     	record.setUser(user);
     }
+    
+    public Program getProgram(){ 
+        return record.getProgram();
+    }
+    public void setProgram(Program program){ 
+        record.setProgram(program); 
+    }
+	
+	public String getDate(){ 
+        return record.getDate(); 
+    }
+    public void setDate(String date){
+        record.setDate(date); 
+    }
+	
+	public String getDescription(){ 
+        return record.getDescription(); 
+    }
+    public void setDescription(String description){ 
+        record.setDescription(description); 
+    }
 
     public HashMap<String, Object> toHashMap() {
         return record.toHashMap();

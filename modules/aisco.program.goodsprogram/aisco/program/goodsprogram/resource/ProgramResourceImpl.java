@@ -20,13 +20,13 @@ import vmj.routing.route.exceptions.*;
 import vmj.auth.annotations.Restricted;
 
 public class ProgramResourceImpl extends ProgramResourceComponent {
-//    public ProgramResourceImpl (ProgramResourceComponent record) {
-//        // to do implement the method
-//    }
 
     @Restricted(permissionName="CreateGoodsProgram")
     @Route(url="call/goodsprogram/save")
     public List<HashMap<String,Object>> saveProgram(VMJExchange vmjExchange){
+        if (vmjExchange.getHttpMethod().equals("OPTIONS")) {
+			return null;
+		}
 		Program program = createProgram(vmjExchange);
 		programRepository.saveObject(program);
 		return getAllProgram(vmjExchange);
@@ -72,23 +72,31 @@ public class ProgramResourceImpl extends ProgramResourceComponent {
         String description = (String) payload.get("description");
         String target = (String) payload.get("target");
         String partner = (String) payload.get("partner");
-        String logoUrl = "";
         String executionDate = (String) payload.get("executionDate");
         
-        Map<String, byte[]> uploadedFile = (HashMap<String, byte[]>) payload.get("logoUrl");
-        logoUrl = "data:" + (new String(uploadedFile.get("type"))).split(" ")[1].replaceAll("\\s+", "")
-                + ";base64," + Base64.getEncoder().encodeToString(uploadedFile.get("content"));
-        int fileSize = uploadedFile.get("content").length;
-        if (fileSize > 4000000)
-            throw new FileSizeException(4.0, ((double) fileSize) / 1000000, "megabyte");
+        String logoUrl = "";
+        
         try {
-            String type = URLConnection
-                    .guessContentTypeFromStream(new ByteArrayInputStream(uploadedFile.get("content")));
-            if (type == null || !type.startsWith("image"))
-                throw new FileTypeException("image");
-        } catch (IOException e) {
-            throw new FileNotFoundException();
+	         Map<String, byte[]> uploadedFile = (HashMap<String, byte[]>) payload.get("logoUrl");
+	         logoUrl = "data:" + (new String(uploadedFile.get("type"))).split(" ")[1].replaceAll("\\s+", "")
+	                 + ";base64," + Base64.getEncoder().encodeToString(uploadedFile.get("content"));
+	         int fileSize = uploadedFile.get("content").length;
+	         if (fileSize > 4000000)
+	             throw new FileSizeException(4.0, ((double) fileSize) / 1000000, "megabyte");
+	         try {
+	             String type = URLConnection
+	                     .guessContentTypeFromStream(new ByteArrayInputStream(uploadedFile.get("content")));
+	             if (type == null || !type.startsWith("image"))
+	                 throw new FileTypeException("image");
+	         } catch (IOException e) {
+	             throw new FileNotFoundException();
+	         }
+        } catch (ClassCastException e) {
+        	 logoUrl = (String) payload.get("logoUrl");
         }
+         
+
+//        String logoUrl = (String) payload.get("logoUrl");
 		String goodsName = (String) payload.get("goodsName");
 		String unit = (String) payload.get("unit");
 		

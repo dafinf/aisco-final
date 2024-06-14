@@ -19,6 +19,15 @@ public interface Withdraw {
     
     public String getDisbursementMethod();
 	public void setDisbursementMethod(String disbursementMethod);
+	
+	public Program getProgram();
+	public void setProgram(Program program);
+
+	public String getDate();
+	public void setDate(String date);
+
+	public String getDescription();
+	public void setDescription(String description);
     
     public User getUser();
     public void setUser(User user);

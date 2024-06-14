@@ -90,6 +90,15 @@ public class DonationResourceImpl extends DonationResourceComponent {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String date = currentDate.format(formatter);
         
+        System.out.println("Assalamualaikum");
+        System.out.println(program.getName());
+        System.out.println(program.getDescription());
+        System.out.println(description);
+        System.out.println(date);
+        System.out.println(id);
+        System.out.println(objectName);
+        System.out.println("Wassalamualaikum");
+        
         long amount = 0L;
         if (payload.get("amount") != null)  {
         	String amountStr = (String) payload.get("amount");

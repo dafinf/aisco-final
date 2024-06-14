@@ -16,7 +16,7 @@
 	"Withdraw":["aisco.withdraw.core"],
 	"Confirmation": ["aisco.donation.confirmation"],
 	"ViaPaymentGateway": ["aisco.donation.viapaymentgateway"],
-	"viaDisbursement":["aisco.withdraw.viaDisbursement"],
+	"viaDisbursement":["aisco.withdraw.viadisbursement"],
 	"DonasiLoggedIn": ["aisco.donation.donasiloggedin"],
 	"GoodsDonation": ["aisco.donation.goodsdonation"]
 }

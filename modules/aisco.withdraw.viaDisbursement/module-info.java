@@ -1,6 +1,6 @@
-module aisco.withdraw.viaDisbursement {
+module aisco.withdraw.viadisbursement {
 	requires aisco.withdraw.core;
-    exports aisco.withdraw.viaDisbursement;
+    exports aisco.withdraw.viadisbursement;
 	
 	requires aisco.program.core;
 	requires aisco.financialreport.core;
@@ -21,5 +21,5 @@ module aisco.withdraw.viaDisbursement {
  	requires google.http.gson;
  	requires gson;
     
-    opens aisco.withdraw.viaDisbursement to org.hibernate.orm.core, gson;
+    opens aisco.withdraw.viadisbursement to org.hibernate.orm.core, gson;
 }

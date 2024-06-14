@@ -115,7 +115,7 @@ public class FinancialReportResourceImpl extends FinancialReportResourceDecorato
     @Route(url="call/income/accumulatedonation")
     public HashMap<String, Object> accumulateDonation(VMJExchange vmjExchange) {
 
-    	String idProgramStr = vmjExchange.getGETParam("idProgram");
+    	String idProgramStr = vmjExchange.getGETParam("id");
         UUID idProgram = UUID.fromString(idProgramStr);
         List<FinancialReport> incomeList = financialReportRepository.getListObject("financialreport_comp", "coa_id", 42010);
         

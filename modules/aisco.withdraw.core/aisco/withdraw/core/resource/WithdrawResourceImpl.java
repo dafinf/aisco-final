@@ -69,18 +69,56 @@ public class WithdrawResourceImpl extends WithdrawResourceComponent {
 
     public Withdraw createWithdraw(VMJExchange vmjExchange, UUID id, String objectName) {
         Map<String, Object> payload = vmjExchange.getPayload();
+        String disbursementMethod = (String) payload.get("disbursementMethod");
+        String description = (String) payload.get("description");
+
+        String idProgramStr = (String) payload.get("idprogram");
+        Program program = null;
+        if (idProgramStr != null) {
+        	UUID idProgram = UUID.fromString(idProgramStr);
+//            program = withdrawRepository.getProxyObject(ProgramComponent.class, idProgram);
+            program = programRepository.getObject(idProgram);
+        }
+        
+//        String date = (String) payload.get("date");
+        // set date as today
+        LocalDate currentDate = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String date = currentDate.format(formatter);
+//        
+//        Donation donation = DonationFactory.createDonation("aisco.donation.core.DonationImpl", id, name, email, phone,
+//                amount, paymentMethod, date, program, description, objectName);
+        System.out.println("Assalamualaikum");
+        System.out.println(program.getName());
+        System.out.println(program.getDescription());
+        System.out.println(description);
+        System.out.println(date);
+        System.out.println(id);
+        System.out.println(objectName);
+        System.out.println("Wassalamualaikum");
         
         long amount = 0L;
         if (payload.get("amount") != null)  {
         	String amountStr = (String) payload.get("amount");
+        	System.out.println(amountStr);
         	amount = Long.parseLong(amountStr);
+        	System.out.println(amount);
         }
         if (amount < 0) {
             throw new FieldValidationException("Nilai amount harus lebih besar dari 0");
         }
-        Withdraw withdraw = WithdrawFactory.createWithdraw("aisco.withdraw.core.WithdrawImpl", id,
-                amount, objectName);
         
+        Withdraw withdraw = WithdrawFactory.createWithdraw("aisco.withdraw.core.WithdrawImpl", id, amount, date, program, description, disbursementMethod, objectName);
+        
+//        public WithdrawImpl (long amount, String date, ProgramComponent program, String description, String disbursementMethod)
+//        {
+//            this(UUID.randomUUID(), amount, date, program, description, disbursementMethod, WithdrawImpl.class.getName());
+//        }
+//    	
+//    	public WithdrawImpl (long amount, String date, ProgramComponent program, String description, String disbursementMethod, String objectName)
+//        {
+//            this(UUID.randomUUID(), amount, date, program, description, disbursementMethod, objectName);
+//        }
      // assign User
         withdraw = assignUser(vmjExchange, withdraw);
         return withdraw;

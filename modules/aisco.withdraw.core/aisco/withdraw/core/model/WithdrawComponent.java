@@ -24,8 +24,11 @@ public abstract class WithdrawComponent implements Withdraw
     protected UUID id;
     protected long amount;
     protected String disbursementMethod;
+    protected String date;
     protected String objectName = WithdrawImpl.class.getName();
-	
+    
+    @ManyToOne(targetEntity=aisco.program.core.ProgramComponent.class)
+	protected Program program;
 	
 	// @ManyToOne(cascade=CascadeType.ALL)
     @ManyToOne(targetEntity=aisco.financialreport.core.FinancialReportComponent.class)
@@ -34,6 +37,7 @@ public abstract class WithdrawComponent implements Withdraw
     @ManyToOne(targetEntity=vmj.auth.model.core.UserImpl.class)
     protected User user;
 	
+    protected String description;
 	
     public UUID getId() {
         return this.id;
@@ -57,12 +61,27 @@ public abstract class WithdrawComponent implements Withdraw
 	    
     public User getUser() { return this.user;}
     public void setUser(User user) {this.user = user;}
+    
+    public Program getProgram(){ return this.program; }
+    public void setProgram(Program program){ this.program = program; }
+	
+	public String getDate(){ return this.date; }
+    public void setDate(String date){ this.date = date; }
+    
+	public String getDescription(){ return this.description; }
+    public void setDescription(String description){this.description = description; }
 
     public HashMap<String, Object> toHashMap() {
         HashMap<String, Object> withdrawMap = new HashMap<String,Object>();
         withdrawMap.put("id", id);
         withdrawMap.put("amount", getAmount());
+        withdrawMap.put("date", getDate());
         withdrawMap.put("disbursementMethod", getDisbursementMethod());
+        withdrawMap.put("description", getDescription());
+        if (getProgram() != null) {
+        	withdrawMap.put("idProgram", getProgram().getIdProgram());
+        	withdrawMap.put("programName", getProgram().getName());
+        }
 		
 		if (getExpense() != null) {
             withdrawMap.put("idExpense", getExpense().getId());
